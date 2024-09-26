@@ -1,65 +1,86 @@
+"""
+Configuration file for Python scripts used in collisional N-body dynamics simulation.
+
+Usage:
+    python3.9 Planck_spec_ChuizhengKong.py
+
+Version:
+    Last edited by Cha0s_MnK on 2024-09-26 (UTC+08:00).
+"""
+
+#########################
+# CONFIGURE ENVIRONMENT #
+#########################
+
 import numpy as np
 import matplotlib.pyplot as plt
+plt.rcParams.update({
+    "font.family": "Times New Roman",
+    'mathtext.default': 'regular',
+    'xtick.direction': 'in',
+    'ytick.direction': 'in'
+})
 
-# Physical Constants
-h   = 6.62607015e-27  # Planck constant in erg*s
-c   = 2.99792458e10   # Speed of light in cm/s
-k_B = 1.380649e-16    # Boltzmann's constant in erg/K
+# physical constants
+h   = 6.62607015e-34 # Planck constant [J*s]
+c   = 2.99792458e8   # speed of light [m/s]
+k_B = 1.380649e-23   # Boltzmann constant [J/K]
+
+###################
+# SET ARGUMENT(S) #
+###################
+
+# X and Y limits
+lgXmin = -12
+lgXmax = 1
+Ymin = 1e-13
+Ymax = 1e39
+
+######################
+# HELPER FUNCTION(S) #
+######################
 
 def Planck_law(Lambda, T):
     """
     Calculate the spectral radiance of a black body at a given wavelength and temperature.
     
-    Parameters:
-    - Lambda: wavelength [m]
-    - T: temperature [K]
+    Parameter(s):
+    - Lambda (float): wavelength [m]
+    - T      (float): temperature [K]
     
-    Returns:
+    Return(s):
     - Spectral radiance in erg/s/cm^2/cm/sr
     """
-    exponent = (h * c) / (Lambda * k_B * T)
-    B_Lambda = (2.0 * h * c**2) / (Lambda**5) / (np.exp(exponent) - 1.0)
+    return (2.0 * h * c**2) / (Lambda**5) / (np.exp((h * c) / (Lambda * k_B * T)) - 1.0)
 
-    return B_Lambda
+#################
+# MAIN FUNCTION #
+#################
 
-# temperature range: 3e0, 3e1, 3e2, ..., 3e8 K
-Ts = [3 * 10**i for i in range(0, 9)]
+def main():
+    # temperature and wavelength ranges
+    Ts = [3 * 10**i for i in range(9)] # temperature range: 3e0, 3e1, 3e2, ..., 3e8 K
+    Lambdas_m = np.logspace(lgXmin, lgXmax, num=1000) # wavelength range: 1e-12, 1e-11, 1e-10, ..., 1e0 m
 
-# wavelength Range: 1e0, 1e1, 1e2, ..., 1e9 nm
-Lambdas_nm = np.logspace(0, 9, num=1000)
-Lambdas_m  = Lambdas_nm * 1e-9           # convert [nm] to [m]
+    # plot
+    plt.figure(figsize=(10, 7))
+    colours = plt.cm.viridis(np.linspace(0, 1, len(Ts)))
+    for T, colour in zip(Ts, colours):
+        plt.plot(Lambdas_nm, Planck_law(Lambdas_m, T), label=f"{T} K", color=colour)
 
-# Observing Facility: Hubble Space Telescope (Optical ~550 nm)
-#hst_wavelength_nm = 550  # nm
-#hst_wavelength_cm = hst_wavelength_nm * 1e-7  # Convert nm to cm
+    # plot settings
+    plt.xlabel("Wavelength / nm")
+    plt.ylabel("Spectral Radiance (erg/s/cm²/cm/sr)")
+    plt.title("Planck Spectrum for Various Temperatures")
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlim(10 ** lgXmin, 10 ** lgXmax)
+    plt.ylim(Ymin, Ymax)
+    plt.legend(loc='upper right', fontsize='small')
+    plt.tight_layout()
 
-# Plot Setup
-plt.figure(figsize=(10, 7))
+    # save the plot as a PDF file
+    plt.savefig("Planck_spec_ChuizhengKong.pdf")
 
-# Colors for different temperatures
-colours = plt.cm.viridis(np.linspace(0, 1, len(Ts)))
-
-for i, T in enumerate(Ts):
-    Bs_Lambda = Planck_law(Lambdas_m, T)
-    plt.plot(Lambdas_nm, Bs_Lambda, label=f"{T} K", color=colours[i])
-    
-    # Optional: Highlight the peak wavelength using Wien's Displacement Law
-    #peak_wavelength_cm = (2.897771955e-1) / T  # Wien's Law: λ_max (cm) = 2.897771955e-1 / T
-    #peak_wavelength_nm = peak_wavelength_cm * 1e7
-    #plt.scatter(peak_wavelength_nm, planck_wavelength(peak_wavelength_cm, T), color=colors[idx], s=20, marker='o')
-
-# Plot Observing Facility Wavelength
-#`plt.axvline(x=hst_wavelength_nm, color='red', linestyle='--', label='HST Optical (~550 nm)')
-
-# Labels and Title
-plt.xlabel("Wavelength (nm)")
-plt.ylabel("Spectral Radiance (erg/s/cm²/cm/sr)")
-plt.title("Planck Spectrum for Various Temperatures with HST Optical Wavelength")
-plt.xscale('log')
-plt.yscale('log')
-plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small')
-plt.tight_layout()
-
-# Save the plot as PDF
-plt.savefig("Planck_spec_ChuizhengKong.pdf")
-plt.show()
+if __name__ == "__main__":
+    main()
