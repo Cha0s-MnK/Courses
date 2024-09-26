@@ -26,7 +26,7 @@ def Planck_law(Lambda, T):
 Ts = [3 * 10**i for i in range(0, 9)]
 
 # wavelength Range: 1e0, 1e1, 1e2, ..., 1e9 nm
-Lambdas_nm = np.logspace(0, 9, num=1000)``
+Lambdas_nm = np.logspace(0, 9, num=1000)
 Lambdas_m  = Lambdas_nm * 1e-9           # convert [nm] to [m]
 
 # Observing Facility: Hubble Space Telescope (Optical ~550 nm)
