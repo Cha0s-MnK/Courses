@@ -1,11 +1,7 @@
 """
-Configuration file for Python scripts used in collisional N-body dynamics simulation.
-
-Usage:
-    python3.9 Planck_spec_ChuizhengKong.py
-
-Version:
-    Last edited by Cha0s_MnK on 2024-09-28 (UTC+08:00).
+Function: Plot the Planck spectrum for a range of temperatures
+Usage:   python3.9 Planck_spec_ChuizhengKong.py
+Version: Last edited by Cha0s_MnK on 2024-09-30 (UTC+08:00).
 """
 
 #########################
@@ -18,9 +14,9 @@ plt.rcParams.update({
     "font.family": "Times New Roman",
     'mathtext.default': 'regular',
     'xtick.direction': 'in',
-    'ytick.direction': 'in'
+    'ytick.direction': 'in',
+    'text.usetex': True
 })
-plt.rcParams['text.usetex'] = True
 from scipy.constants import h, c, k
 k_B = k
 
@@ -82,12 +78,13 @@ def main():
         plt.plot(Lambdas, Planck_law(Lambdas, T), label=f"{T:.1e} K", color=colour)
 
     # add JWST observable wavelength (6.0e-7 - 2.83e-5 m)
+    # reference: https://en.wikipedia.org/wiki/James_Webb_Space_Telescope
     plt.axvspan(JWSTlambdaStart, JWSTlambdaStop, color='gray', alpha=0.3, label='JWST observable range')
     plt.text(JWSTposX, plt.ylim()[1], f'({JWSTlambdaStart}, {JWSTlambdaStop})', color='black', fontsize=10, ha='center', va='bottom')
 
     # plot settings
     plt.xlabel(r'Wavelength $\lambda$ (m)')
-    plt.ylabel(r'Specific Intensity $I_\lambda$ (W·m$^{-3}$)')
+    plt.ylabel(r'Specific Intensity $I_\lambda$ (W·m$^{-3}$·sr$^{-1}$)')
     plt.title('Planck Spectrum for Various Temperatures')
     plt.xscale('log')
     plt.yscale('log')
