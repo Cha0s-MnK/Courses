@@ -1,7 +1,7 @@
 """
-Function: Plot the Planck spectrum for a range of temperatures.
+Function: Plot Planck spectrum for a range of temperatures.
 Usage:    python3.9 Planck_spec_ChuizhengKong.py
-Version:  Last edited by Cha0s_MnK on 2024-09-30 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-10-02 (UTC+08:00).
 """
 
 #########################
@@ -38,10 +38,14 @@ lgXmax = 1
 Ymin   = 1e-13
 Ymax   = 1e39
 
+# temperature and wavelength ranges
+Ts      = 3 * np.logspace(0, 8, num=9, base=10) # temperature range: 3.0e0, 3.0e1, ..., 3.0e8 K
+Lambdas = np.logspace(lgXmin, lgXmax, num=1000) # wavelength range: 1.0e-12, 1.0e-11, ..., 1.0e0 m
+
 # JWST observable range
-JWSTlambdaStart = 6.0e-7
-JWSTlambdaStop  = 2.83e-5
-JWSTposX        = 4.3e-6
+lambdaJWSTmin = 6.0e-7
+lambdaJWSTmax = 2.83e-5
+JWSTposX      = 4.3e-6
 
 ######################
 # HELPER FUNCTION(S) #
@@ -56,7 +60,7 @@ def Planck_law(Lambda: np.ndarray, T: float) -> np.ndarray:
     - T        (float):      temperature [K]
 
     Return(s):
-    - I_Lambda (np.ndarray): specific intensity [W/m^3]
+    - I_Lambda (np.ndarray): specific intensity [W·m⁻³]
     """
     return (2.0 * h * c**2) / (Lambda**5) / (np.exp((h * c) / (Lambda * k_B * T)) - 1.0)
 
@@ -65,27 +69,23 @@ def Planck_law(Lambda: np.ndarray, T: float) -> np.ndarray:
 #################
 
 def main():
-    # temperature and wavelength ranges
-    Ts      = 3 * np.logspace(0, 8, num=9, base=10) # temperature range: 3.0e0, 3.0e1, ..., 3.0e8 K
-    Lambdas = np.logspace(lgXmin, lgXmax, num=1000) # wavelength range: 1.0e-12, 1.0e-11, ..., 1.0e0 m
+    # plot settings 1
+    plt.figure(figsize=(figsizeX, figsizeY))
+    plt.xlabel(r'wavelength $\lambda$ (m)')
+    plt.ylabel(r'specific intensity $I_\lambda$ (W·m$^{-3}$·sr$^{-1}$)')
+    plt.title('Planck spectrum for various temperatures')
 
     # plot Planck spectrum for various temperatures
-    plt.figure(figsize=(figsizeX, figsizeY))
     colours = plt.cm.tab10(np.linspace(0, 1, len(Ts)))
     for T, colour in zip(Ts, colours):
-        plt.plot(Lambdas, Planck_law(Lambdas, T), label=f"{T:.1e} K", color=colour)
+        plt.loglog(Lambdas, Planck_law(Lambdas, T), label=f"{T:.1e} K", color=colour)
 
     # add JWST observable wavelength (6.0e-7 - 2.83e-5 m)
     # reference: https://en.wikipedia.org/wiki/James_Webb_Space_Telescope
-    plt.axvspan(JWSTlambdaStart, JWSTlambdaStop, color='gray', alpha=0.3, label='JWST observable range')
-    plt.text(JWSTposX, plt.ylim()[1], f'({JWSTlambdaStart}, {JWSTlambdaStop})', color='black', fontsize=10, ha='center', va='bottom')
+    plt.axvspan(lambdaJWSTmin, lambdaJWSTmax, color='gray', alpha=0.3, label='JWST observable range')
+    #plt.text(JWSTposX, plt.ylim()[1], f'({lambdaJWSTmin}, {lambdaJWSTmax})', color='black', fontsize=10, ha='center', va='bottom')
 
-    # plot settings
-    plt.xlabel(r'Wavelength $\lambda$ (m)')
-    plt.ylabel(r'Specific Intensity $I_\lambda$ (W·m$^{-3}$·sr$^{-1}$)')
-    plt.title('Planck Spectrum for Various Temperatures')
-    plt.xscale('log')
-    plt.yscale('log')
+    # plot settings 2
     plt.xlim(10 ** lgXmin, 10 ** lgXmax)
     plt.ylim(Ymin, Ymax)
     plt.legend(loc='upper right', fontsize='small')

@@ -1,7 +1,7 @@
 """
-Function: Plot the plasma and Larmor's frequencies for a range of electron densities or B-field strengths.
+Function: Plot plasma and Larmor frequencies for a range of electron densities or B-field strengths.
 Usage:    python3.9 Plasma_freq_ChuizhengKong.py
-Version:  Last edited by Cha0s_MnK on 2024-09-30 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-10-02 (UTC+08:00).
 """
 
 #########################
@@ -28,13 +28,23 @@ m_e       = 9.109383713928e-31 # electron mass [kg]
 # SET ARGUMENT(S) #
 ###################
 
-# Frequency range of LHAASO telescope (in Hz)
-LHAASO_min_freq = 1e8  # 100 MHz
-LHAASO_max_freq = 1e9  # 1 GHz
+# figure size
+figsizeX = 9
+figsizeY = 6
 
-# Define range of electron densities (in m^-3) and magnetic field strengths (in Tesla)
-ns_e = np.logspace(6, 12, 100)  # electron number density range: from 1e6 to 1e12 m^-3
-Bs   = np.logspace(-9, -3, 100)  # magnetic field strength range: from 1 nT to 1 mT
+# X limits
+lgX1min = 0
+lgX1max = 16
+lgX2min = -16
+lgX2max = 0
+
+# frequency range of FAST [Hz]
+freqFASTmin = 7.0e7
+freqFASTmax = 3.0e9
+
+# electron number density and magnetic field strength ranges
+ns_e = np.logspace(lgX1min, lgX1max, 100)  # electron (number) density range: 1.0e0, 1.0e1, ..., 1.0e16 [m⁻³]
+Bs   = np.logspace(lgX2min, lgX2max, 100)  # magnetic field strength range: 1.0e-16, 1.0e-15, ..., 1.0e0 [T]
 
 ######################
 # HELPER FUNCTION(S) #
@@ -71,29 +81,25 @@ def calc_Larmor_freq(B: np.ndarray) -> np.ndarray:
 #################
 
 def main():
-    # plot Planck spectrum for various temperatures
-    plt.figure(figsize=(figsizeX, figsizeY))
-    # Plot plasma frequency vs. electron density
-    plt.loglog(electron_densities, plasma_frequencies, label='Plasma Frequency', color='blue')
+    # plot settings 1
+    fig, ax1 = plt.subplots(figsize=(figsizeX, figsizeY))
+    ax1.set_xlabel(r'electron number density $n_e$ (m$^{-3}$)')
+    ax1.set_ylabel(r'angular frequencies $\omega$ (s$^{-1}$)')
+    ax1.set_title('Plasma and Larmor frequencies with FAST range')
+    ax1.grid(True, which="both", linestyle='--', linewidth=0.5)
+    ax2 = ax1.twiny()
+    ax2.set_xlabel(r'magnetic field strength $B$ (T)')
 
-    # Plot Larmor frequency vs. magnetic field strength
-    plt.loglog(B_fields, larmor_frequencies, label='Larmor Frequency', color='green')
+    # plot the plasma, Larmor frequencies and the FAST frequency range
+    ax1.loglog(ns_e, calc_plasma_freq(ns_e), color='red', label=r'plasma frequencies $\omega_\mathrm{p}$')
+    ax2.loglog(Bs, calc_Larmor_freq(Bs), color='green', label=r'Larmor frequencies $\omega_\mathrm{L}$')
+    ax2.axhspan(freqFASTmin, freqFASTmax, color='gray', alpha=0.3, label='FAST frequency range')
 
-    # Plot the LHAASO telescope frequency range
-    plt.fill_betweenx([1e6, 1e12], LHAASO_min_freq, LHAASO_max_freq, color='gray', alpha=0.3, label='LHAASO Frequency Range')
-
-    # plot settings
-    plt.xlabel(r'Wavelength $\lambda$ (m)')
-    plt.ylabel(r'Specific Intensity $I_\lambda$ (W·m$^{-3}$·sr$^{-1}$)')
-    plt.xlim(10 ** lgXmin, 10 ** lgXmax)
-    plt.ylim(Ymin, Ymax)
-    plt.legend(loc='upper right', fontsize='small')
+    # plot settings 2
+    handles1, labels1 = ax1.get_legend_handles_labels()
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(handles1 + handles2, labels1 + labels2, loc='upper left')
     plt.tight_layout()
-    plt.xlabel('Electron Density (m$^{-3}$) / Magnetic Field Strength (T)')
-    plt.ylabel('Frequency (Hz)')
-    plt.title('Plasma and Larmor Frequencies with LHAASO Telescope Range')
-    plt.legend()
-    plt.grid(True, which="both", linestyle='--', linewidth=0.5)
 
     # save the plot as a PDF file
     plt.savefig("Plasma_freq_ChuizhengKong.pdf")
