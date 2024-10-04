@@ -1,7 +1,7 @@
 """
-Function: Plot plasma and Larmor frequencies for a range of electron densities or B-field strengths.
+Function: Statistics & Numerical Methods, Problem 1.1
 Usage:    python3.9 prob1.1.py
-Version:  Last edited by Cha0s_MnK on 2024-10-03 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-10-04 (UTC+08:00).
 """
 
 #########################
@@ -23,10 +23,10 @@ def calc_machine_precision(data_type: type):
     numerically equal to 1 in the given precision. The last value before 1+ϵ_m equals 1 is taken as the machine
     precision ϵ_m.
 
-    Parameters:
+    Parameter(s):
     - data_type (type):      The floating-point data type (e.g. np.float32, np.float64) to evaluate.
 
-    Returns:
+    Return(s):
     - epsilon_m (data_type): The machine precision for the specified data type.
     """
     epsilon_m = data_type(1)
@@ -43,10 +43,10 @@ def calc_smallest_positive(data_type: type):
     We start with f_min=1 and repeatedly halve it until the value becomes zero in the given precision. The last
     non-zero value before underflowing to zero is taken as f_min.
 
-    Parameters:
+    Parameter(s):
     - data_type (type):  The floating-point data type (e.g. np.float32, np.float64) to evaluate.
 
-    Returns:
+    Return(s):
     - f_min (data_type): The smallest positive number for the specified data type.
     """
     f_min = data_type(1)
