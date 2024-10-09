@@ -37,6 +37,11 @@ m_e       = 9.109383713928e-31 # electron mass [kg]
 #################
 
 def main():
+    Delta_t = 199e-3
+    omega_1 = 1.4e9
+    omega_2 = 3e9
+    result  = Delta_t * m_e * c / (2 * np.pi * e **2 * (1 / omega_1**2  - 1 / omega_2**2))
+    print(result)
 
 if __name__ == "__main__":
     main()
