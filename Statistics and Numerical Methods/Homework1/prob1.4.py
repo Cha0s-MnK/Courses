@@ -162,11 +162,11 @@ def solve_Hilbert_problem(N, norm=np.inf, data_type: type = float):
     
     This function returns the relative error of the computed solution.
     """
-        
+
     # solve Ax=b using Cholesky decomposition
     x_exact   = np.ones(N)
     x_numeric = solve_Cholesky(Hilbert_matrix(N, data_type), Hilbert_vector(N, data_type))
-        
+
     # calculate the relative error using specified norm
     err_r = calc_relative_error(x_exact=x_exact, x_numeric=x_numeric, norm=norm)
 
