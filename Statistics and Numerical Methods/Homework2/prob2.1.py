@@ -143,9 +143,9 @@ def solve_conjugate_gradient(varphi_field):
     # conjugate gradient method
 
     normRs = []
+    R = calcR(varphi_field)
     for k in range(NumMaxIterat):
         enforceBCs(varphi_field)
-        R     = calcR(varphi_field)
         normR = np.linalg.norm(R, ord=NormOrder)
         normRs.append(normR)
         if normR < varepsilon:
