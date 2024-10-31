@@ -25,6 +25,8 @@ k_B       = 1.380649e-23        # Boltzmann constant [J·K⁻¹]
 m_e       = 9.109383713928e-31  # electron mass [kg]
 m_p       = 1.6726219259552e-27 # proton mass [kg]
 
+pc = 3.0856775814913673e16 # [m]
+
 ###################
 # SET ARGUMENT(S) #
 ###################
@@ -38,10 +40,13 @@ m_p       = 1.6726219259552e-27 # proton mass [kg]
 #################
 
 def main():
-    T = 1e4
-    print(np.sqrt(3 * k_B * T / m_p))
-    print(np.sqrt(3 * k_B * T / m_e))
-    print(np.sqrt(3 * k_B * T / m_p) + np.sqrt(3 * k_B * T / m_e))
+    n_e = 5e4
+    l   = 4e5 * pc
+    sigma_T = 8 * np.pi * e**4 / (3 * m_e**2 * c**4)
+    N   = n_e * sigma_T * l
+    y = 0.00278
+    T_e = y * m_e * c **2 / (4 * N * k_B)
+    print(T_e)
 
 if __name__ == "__main__":
     main()
