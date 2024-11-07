@@ -1,57 +1,53 @@
 """
 Function: Solution to Problem 3.1 in Statistics & Numerical Methods.
 Usage:    python3.11 prob3.1.py
-Version:  Last edited by Cha0s_MnK on 2024-11-02 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-11-06 (UTC+08:00).
 """
 
-#######################################################
-# CONFIGURE ENVIRONMENT & SET ARGUMENTS & SET OPTIONS #
-#######################################################
+###########################################
+# CONFIGURE ENVIRONMENT & SET ARGUMENT(S) #
+###########################################
 
 from config import *
-
-###################
-# SET ARGUMENT(S) #
-###################
 
 ######################
 # HELPER FUNCTION(S) #
 ######################
 
-def createIC(t_init: FLOAT = 0.0, x_init: FLOAT = 1.0, y_init: FLOAT = 0.0, v_x_init: FLOAT = 0.0,
-             v_y_init: FLOAT = 1.0) -> Tuple[List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT]]:
+def createIC(t_init: FLOAT = 0.0, x_init: FLOAT = 1.0, y_init: FLOAT = 0.0, vx_init: FLOAT = 0.0,
+             vy_init: FLOAT = 1.0) -> Tuple[List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT]]:
     """
     Initialize and return the ICs for time, position and velocity.
 
     Parameter(s):
-    - t_init   (FLOAT, optional, default = 0.0): initial time value
-    - x_init   (FLOAT, optional, default = 1.0): initial X-coordinate
-    - y_init   (FLOAT, optional, default = 0.0): initial Y-coordinate
-    - v_x_init (FLOAT, optional, default = 0.0): initial X-component of the velocity
-    - v_y_init (FLOAT, optional, default = 1.0): initial Y-component of the velocity
+    - t_init  (FLOAT, optional, default = 0.0): initial time value
+    - x_init  (FLOAT, optional, default = 1.0): initial X-coordinate
+    - y_init  (FLOAT, optional, default = 0.0): initial Y-coordinate
+    - vx_init (FLOAT, optional, default = 0.0): initial X-component of the velocity
+    - vy_init (FLOAT, optional, default = 1.0): initial Y-component of the velocity
 
     Return(s):
     - tuple: a tuple of lists containing the ICs:
-        - ts   (List[FLOAT]): time values (initialized with t_init)
-        - xs   (List[FLOAT]): X-coordinates (initialized with x_init)
-        - ys   (List[FLOAT]): Y-coordinates (initialized with y_init)
-        - vs_x (List[FLOAT]): X-components of velocity (initialized with v_x_init)
-        - vs_y (List[FLOAT]): Y-components of velocity (initialized with v_y_init)
+        - ts  (List[FLOAT]): time values (initialized with t_init)
+        - xs  (List[FLOAT]): X-coordinates (initialized with x_init)
+        - ys  (List[FLOAT]): Y-coordinates (initialized with y_init)
+        - vxs (List[FLOAT]): X-components of velocity (initialized with vx_init)
+        - vys (List[FLOAT]): Y-components of velocity (initialized with vy_init)
     """
 
     # initialize lists with the ICs
-    return [t_init], [x_init], [y_init], [v_x_init], [v_y_init]
+    return [t_init], [x_init], [y_init], [vx_init], [vy_init]
 
-def calcEs_Ls(xs: List[FLOAT], ys: List[FLOAT], vs_x: List[FLOAT], vs_y: List[FLOAT]) -> \
+def calcEs_Ls(xs: List[FLOAT], ys: List[FLOAT], vxs: List[FLOAT], vys: List[FLOAT]) -> \
     Tuple[List[FLOAT], List[FLOAT]]:
     """
     Calculate the total energy (Es) and angular momentum (Ls) for each timestep.
 
     Parameter(s):
-    - xs   (List[FLOAT]): X-coordinates at each timestep
-    - ys   (List[FLOAT]): Y-coordinates at each timestep
-    - vs_x (List[FLOAT]): X-components of velocity at each timestep
-    - vs_y (List[FLOAT]): Y-components of velocity at each timestep
+    - xs  (List[FLOAT]): X-coordinates at each timestep
+    - ys  (List[FLOAT]): Y-coordinates at each timestep
+    - vxs (List[FLOAT]): X-components of velocity at each timestep
+    - vys (List[FLOAT]): Y-components of velocity at each timestep
 
     Return(s):
     - tuple: a tuple containing
@@ -60,10 +56,42 @@ def calcEs_Ls(xs: List[FLOAT], ys: List[FLOAT], vs_x: List[FLOAT], vs_y: List[FL
     """
     Es = []
     Ls = []
-    for x, y, v_x, v_y in zip(xs, ys, vs_x, vs_y):
-        Es.append(0.5 * (v_x**2 + v_y**2) - 1 / np.sqrt(x**2 + y**2))
-        Ls.append(x * v_y - y * v_x)
+    for x, y, vx, vy in zip(xs, ys, vxs, vys):
+        Es.append(0.5 * (vx**2 + vy**2) - 1 / np.sqrt(x**2 + y**2))
+        Ls.append(x * vy - y * vx)
     return Es, Ls
+
+def calc_errors(Delta_ts: List[FLOAT], t_f: FLOAT, method) -> Tuple[List[FLOAT], List[FLOAT], List[FLOAT]]:
+    """
+    Calculate the final errors in position, total energy and angular momentum for different timesteps using 
+    the specified method for numerical integration.
+
+    Parameter(s):
+    - Delta_ts (List[FLOAT]): a list of timesteps to use in the the specified numerical integration.
+    - t_f      (FLOAT)      : the final time for the integration
+    - method   (function)   : the method to use for numerical integration
+
+    Return(s):
+    - errs_f_pos (List[FLOAT]): a list of position errors at the final time for each timestep
+    - errs_f_E   (List[FLOAT]): a list of energy errors at the final time for each timestep
+    - errs_f_L   (List[FLOAT]): a list of angular momentum errors at the final time for each timestep
+    """
+    # lists to store errors for each timestep
+    errs_f_pos = []
+    errs_f_E   = []
+    errs_f_L   = []
+
+    # loop over each timestep
+    for Delta_t in Delta_ts:
+        ts_numeric, xs_numeric, ys_numeric, vxs_numeric, vys_numeric = method(Delta_t = Delta_t, t_f = t_f)
+        Es_numeric, Ls_numeric = calcEs_Ls(xs = xs_numeric, ys = ys_numeric, vxs = vxs_numeric, vys = vys_numeric)
+
+        errs_f_pos.append(np.sqrt((xs_numeric[-1] - np.cos(ts_numeric)[-1])**2 + (ys_numeric[-1] - np.sin(ts_numeric)[-1])**2))
+        errs_f_E.append(np.abs(Es_numeric[-1] - Es_numeric[0]))
+        errs_f_L.append(np.abs(Ls_numeric[-1] - Ls_numeric[0]))
+
+    return errs_f_pos, errs_f_E, errs_f_L
+
 
 def forwardEuler(Delta_t: FLOAT, t_f: FLOAT) -> \
     Tuple[List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT]]:
@@ -76,38 +104,38 @@ def forwardEuler(Delta_t: FLOAT, t_f: FLOAT) -> \
 
     Return(s):
     - tuple: a tuple of lists containing the time, positions and velocities
-        - ts   (List[FLOAT]): time values
-        - xs   (List[FLOAT]): X-coordinates
-        - ys   (List[FLOAT]): Y-coordinates
-        - vs_x (List[FLOAT]): X-components of velocity
-        - vs_y (List[FLOAT]): Y-components of velocity
+        - ts  (List[FLOAT]): time values
+        - xs  (List[FLOAT]): X-coordinates
+        - ys  (List[FLOAT]): Y-coordinates
+        - vxs (List[FLOAT]): X-components of velocity
+        - vys (List[FLOAT]): Y-components of velocity
     """
     # initialize the ICs
-    ts, xs, ys, vs_x, vs_y = createIC()
+    ts, xs, ys, vxs, vys = createIC()
 
     # loop until the final time is reached
     while ts[-1] < t_f:
         # get the current state
-        t, x, y, v_x, v_y = ts[-1], xs[-1], ys[-1], vs_x[-1], vs_y[-1]
+        t, x, y, vx, vy = ts[-1], xs[-1], ys[-1], vxs[-1], vys[-1]
 
         # update time, positions and velocities
         t_next = t + Delta_t
 
-        x_next = x + v_x * Delta_t
-        y_next = y + v_y * Delta_t
+        x_next = x + vx * Delta_t
+        y_next = y + vy * Delta_t
 
         r3_inv = 1 / (np.sqrt(x**2 + y**2)**3)
-        v_x_next = v_x - x * r3_inv * Delta_t
-        v_y_next = v_y - y * r3_inv * Delta_t
+        vx_next = vx - x * r3_inv * Delta_t
+        vy_next = vy - y * r3_inv * Delta_t
 
         # append the updated values to the lists
         ts.append(t_next)
         xs.append(x_next)
         ys.append(y_next)
-        vs_x.append(v_x_next)
-        vs_y.append(v_y_next)
+        vxs.append(vx_next)
+        vys.append(vy_next)
 
-    return ts, xs, ys, vs_x, vs_y
+    return ts, xs, ys, vxs, vys
 
 def RK4(Delta_t: FLOAT, t_f: FLOAT) -> \
     Tuple[List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT], List[FLOAT]]:
@@ -196,19 +224,19 @@ def leapfrog(Delta_t: FLOAT, t_f: FLOAT) -> \
 
     Return(s):
     - tuple: a tuple of lists containing the time, positions and velocities
-        - ts   (List[FLOAT]): time values
-        - xs   (List[FLOAT]): X-coordinates
-        - ys   (List[FLOAT]): Y-coordinates
-        - vs_x (List[FLOAT]): X-components of velocity
-        - vs_y (List[FLOAT]): Y-components of velocity
+        - ts  (List[FLOAT]): time values
+        - xs  (List[FLOAT]): X-coordinates
+        - ys  (List[FLOAT]): Y-coordinates
+        - vxs (List[FLOAT]): X-components of velocity
+        - vys (List[FLOAT]): Y-components of velocity
     """
     # initialize the ICs
     ts, xs, ys, vxs, vys = createIC()
 
     # 1st kick (K) for velocity
     r3inv   = 1 / (np.sqrt(xs[0]**2 + ys[0]**2)**3)
-    vx_half = vx[0] - 0.5 * xs[0] * r3inv * Delta_t
-    vy_half = vy[0] - 0.5 * ys[0] * r3inv * Delta_t
+    vx_half = vxs[0] - 0.5 * xs[0] * r3inv * Delta_t
+    vy_half = vys[0] - 0.5 * ys[0] * r3inv * Delta_t
 
     # loop until the final time is reached
     while ts[-1] < t_f:
@@ -251,42 +279,23 @@ def main():
 
     # plot and save
     fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
-    ax.plot(xs_numeric, ys_numeric, linestyle='--', label='numerical (forward Euler)')
+    ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'forward Euler ($\Delta t$ = 0.01)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True, title = 'Particle Trajectory over 2 Orbital Periods',
+    set_fig(ax = ax, equal = True, title = r'Particle trajectory over 2 orbital periods',
             xlabel = r'$x$', ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.1')
 
-    # timesteps
-    Delta_ts = np.array([5e-4, 1e-3, 2e-3, 4e-3])
-
-    # lists to store errors
-    errs_f_pos = []
-    errs_f_E   = []
-    errs_f_L   = []
-
-    for Delta_t in Delta_ts:
-        ts_numeric, xs_numeric, ys_numeric, vs_x_numeric, vs_y_numeric = forwardEuler(Delta_t = Delta_t, t_f = 4 * np.pi)
-        Es_numeric, Ls_numeric = calcEs_Ls(xs = xs_numeric, ys = ys_numeric, vs_x = vs_x_numeric, vs_y = vs_y_numeric)
-        xs_analy = np.cos(ts_numeric)
-        ys_analy = np.sin(ts_numeric)
-
-        # errors at final time
-        err_f_pos  = np.sqrt((xs_numeric[-1] - xs_analy[-1])**2 + (xs_analy[-1] - ys_analy[-1])**2)
-        err_f_E    = np.abs(Es_numeric[-1] - Es_numeric[0])
-        err_f_L    = np.abs(Ls_numeric[-1] - Ls_numeric[0])
-        errs_f_pos.append(err_f_pos)
-        errs_f_E.append(err_f_E)
-        errs_f_L.append(err_f_L)
+    Delta_ts = [5e-4, 1e-3, 2e-3, 4e-3]
+    errs_f_pos, errs_f_E, errs_f_L = calc_errors(Delta_ts = Delta_ts, t_f = t_f, method = forwardEuler)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
     ax.plot(Delta_ts, errs_f_pos, 'o-', label = r'final position error $\delta_\mathrm{f} (r)$')
     ax.plot(Delta_ts, errs_f_E, '^-', label = r'final total energy error $\delta_\mathrm{f} (E)$')
     ax.plot(Delta_ts, errs_f_L, 's-', label = r'final angular momentum error $\delta_\mathrm{f} (L)$')
-    set_fig(ax = ax, title = 'Final Errors vs. Timesteps',
-            xlabel = r'timestep $\Delta t$', ylabel = r'final errors $\delta_\mathrm{f}$',
-            xlim = [2e-4, 8e-3], xlog = True, ylog = True)
+    set_fig(ax = ax, title = 'Final errors vs. timesteps',
+            xlabel = r'timestep $\Delta t$', ylabel = r'final error $\delta_\mathrm{f}$',
+            xlim = [4e-4, 5e-3], xlog = True, ylog = True)
     save_fig(fig = fig, name = f'prob3.1.2')
 
     # problem 3.1.3
@@ -296,42 +305,25 @@ def main():
 
     # plot and save
     fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
-    ax.plot(xs_numeric, ys_numeric, linestyle='--', label='numerical (RK4)')
+    ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'RK4 ($\Delta t$ = 0.5)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True, title = 'Particle Trajectory over 2 Orbital Periods',
+    set_fig(ax = ax, equal = True,
+            title = r'Particle trajectory over 2 orbital periods',
             xlabel = r'$x$', ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.3')
 
-    # timesteps
-    Delta_ts = np.array([0.05, 0.1, 0.2, 0.4])
-
-    # lists to store errors
-    errs_f_pos = []
-    errs_f_E   = []
-    errs_f_L   = []
-
-    for Delta_t in Delta_ts:
-        ts_numeric, xs_numeric, ys_numeric, vs_x_numeric, vs_y_numeric = RK4(Delta_t = Delta_t, t_f = 4 * np.pi)
-        Es_numeric, Ls_numeric = calcEs_Ls(xs = xs_numeric, ys = ys_numeric, vs_x = vs_x_numeric, vs_y = vs_y_numeric)
-        xs_analy = np.cos(ts_numeric)
-        ys_analy = np.sin(ts_numeric)
-
-        # errors at final time
-        err_f_pos  = np.sqrt((xs_numeric[-1] - xs_analy[-1])**2 + (xs_analy[-1] - ys_analy[-1])**2)
-        err_f_E    = np.abs(Es_numeric[-1] - Es_numeric[0])
-        err_f_L    = np.abs(Ls_numeric[-1] - Ls_numeric[0])
-        errs_f_pos.append(err_f_pos)
-        errs_f_E.append(err_f_E)
-        errs_f_L.append(err_f_L)
+    #
+    Delta_ts = [0.05, 0.1, 0.2, 0.4]
+    errs_f_pos, errs_f_E, errs_f_L = calc_errors(Delta_ts = Delta_ts, t_f = t_f, method = forwardEuler)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
     ax.plot(Delta_ts, errs_f_pos, 'o-', label = r'final position error $\delta_\mathrm{f} (r)$')
     ax.plot(Delta_ts, errs_f_E, '^-', label = r'final total energy error $\delta_\mathrm{f} (E)$')
     ax.plot(Delta_ts, errs_f_L, 's-', label = r'final angular momentum error $\delta_\mathrm{f} (L)$')
-    set_fig(ax = ax, title = 'Final Errors vs. Timesteps',
-            xlabel = r'timestep $\Delta t$', ylabel = r'final errors $\delta_\mathrm{f}$',
-            xlim = [2e-4, 8e-3], xlog = True, ylog = True)
+    set_fig(ax = ax, title = 'Final errors vs. timesteps',
+            xlabel = r'timestep $\Delta t$', ylabel = r'final error $\delta_\mathrm{f}$',
+            xlim = [0.04, 0.5], xlog = True, ylog = True)
     save_fig(fig = fig, name = f'prob3.1.4')
 
     # numerical solution
@@ -339,84 +331,40 @@ def main():
 
     # plot and save
     fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
-    ax.plot(xs_numeric, ys_numeric, linestyle='--', label='numerical (RK4)')
+    ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'RK4 ($\Delta t$ = 1.0)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True, title = 'Particle Trajectory over 2 Orbital Periods',
+    set_fig(ax = ax, equal = True,
+            title = r'Particle trajectory over 2 orbital periods',
             xlabel = r'$x$', ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.5')
 
     # problem 3.1.4
-"""
-# Parameters
-t_max = 10 * 2 * np.pi  # 10 orbital periods
-dt = 0.3
 
-# Numerical solution
-t_lf, x_lf, y_lf, vx_lf, vy_lf = leapfrog(t_max, dt)
+    # numerical solution
+    t_f = 10 * np.pi # 10 orbital periods
+    ts_numeric, xs_numeric, ys_numeric, vxs_numeric, vys_numeric = leapfrog(Delta_t = 0.3, t_f = t_f)
 
-# Analytical solution for reference (only for plotting one period)
-t_analytical = np.linspace(0, 2*np.pi, 1000)
-x_analytical = np.cos(t_analytical)
-y_analytical = np.sin(t_analytical)
+    # plot and save
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
+    ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'leapfrog ($\Delta t$ = 0.3)')
+    ax.plot(xs_analy, ys_analy, label='analytical')
+    set_fig(ax = ax, equal = True,
+            title = r'Particle trajectory over 10 orbital periods',
+            xlabel = r'$x$', ylabel = r'$y$')
+    save_fig(fig = fig, name = f'prob3.1.6')
 
-# Plotting trajectory
-plt.figure(figsize=(8, 8))
-plt.plot(x_lf, y_lf, label='Numerical (Leapfrog)', linestyle='--')
-plt.plot(x_analytical, y_analytical, label='Analytical (One Orbit)', linewidth=2)
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Particle Trajectory Over 10 Orbital Periods (\(\Delta t = 0.3\))')
-plt.legend()
-plt.axis('equal')
-plt.grid(True)
-plt.show()
+    # errors
+    Es_numeric, Ls_numeric = calcEs_Ls(xs = xs_numeric, ys = ys_numeric, vxs = vxs_numeric, vys = vys_numeric)
 
-# Compute analytical positions for comparison (assuming perfect circular motion)
-x_analytical_full = np.cos(t_lf)
-y_analytical_full = np.sin(t_lf)
+    # plot and save
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
+    ax.plot(ts_numeric, np.sqrt((xs_numeric - np.cos(ts_numeric))**2 + (ys_numeric - np.sin(ts_numeric))**2), 'o-', label = r'position error $\delta (r)$')
+    ax.plot(ts_numeric, np.abs(np.array(Es_numeric) - Es_numeric[0]), '^-', label = r'total energy error $\delta (E)$')
+    ax.plot(ts_numeric, np.abs(np.array(Ls_numeric) - Ls_numeric[0]), 's-', label = r'angular momentum error $\delta (L)$')
+    set_fig(ax = ax, title = 'Different errors over time',
+            xlabel = r'time $t$', ylabel = r'error $\delta$',
+            ylog = True)
+    save_fig(fig = fig, name = f'prob3.1.7')
 
-# Position error over time
-position_errors = np.sqrt((x_lf - x_analytical_full)**2 + (y_lf - y_analytical_full)**2)
-
-E_lf, L_lf = compute_energy_and_angular_momentum(x_lf, y_lf, vx_lf, vy_lf)
-
-# Compute initial energy and angular momentum for reference
-E0 = E_lf[0]
-L0 = L_lf[0]
-
-# Energy and angular momentum errors
-energy_errors = np.abs(E_lf - E0)
-angular_momentum_errors = np.abs(L_lf - L0)
-
-# Plotting position error over time
-plt.figure()
-plt.plot(t_lf, position_errors, label='Position Error')
-plt.xlabel('Time')
-plt.ylabel('Position Error')
-plt.title('Time Evolution of Position Error (Leapfrog)')
-plt.grid(True)
-plt.legend()
-plt.show()
-
-# Plotting energy error over time
-plt.figure()
-plt.plot(t_lf, energy_errors, label='Energy Error')
-plt.xlabel('Time')
-plt.ylabel('Energy Error')
-plt.title('Time Evolution of Energy Error (Leapfrog)')
-plt.grid(True)
-plt.legend()
-plt.show()
-
-# Plotting angular momentum error over time
-plt.figure()
-plt.plot(t_lf, angular_momentum_errors, label='Angular Momentum Error')
-plt.xlabel('Time')
-plt.ylabel('Angular Momentum Error')
-plt.title('Time Evolution of Angular Momentum Error (Leapfrog)')
-plt.grid(True)
-plt.legend()
-plt.show()
-"""
 if __name__ == "__main__":
     main()
