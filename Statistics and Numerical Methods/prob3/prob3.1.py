@@ -1,7 +1,7 @@
 """
 Function: Solution to Problem 3.1 in Statistics & Numerical Methods.
 Usage:    python3.11 prob3.1.py
-Version:  Last edited by Cha0s_MnK on 2024-11-06 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-11-11 (UTC+08:00).
 """
 
 ###########################################
@@ -278,24 +278,23 @@ def main():
     ys_analy = np.sin(ts_analy)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 2 * DPI_MIN)
     ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'forward Euler ($\Delta t$ = 0.01)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True, title = r'Particle trajectory over 2 orbital periods',
-            xlabel = r'$x$', ylabel = r'$y$')
+    set_fig(ax = ax, equal = True, title = r'Particle trajectory over 2 orbital periods', xlabel = r'$x$',
+            ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.1')
 
     Delta_ts = [5e-4, 1e-3, 2e-3, 4e-3]
     errs_f_pos, errs_f_E, errs_f_L = calc_errors(Delta_ts = Delta_ts, t_f = t_f, method = forwardEuler)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(Delta_ts, errs_f_pos, 'o-', label = r'final position error $\delta_\mathrm{f} (r)$')
     ax.plot(Delta_ts, errs_f_E, '^-', label = r'final total energy error $\delta_\mathrm{f} (E)$')
     ax.plot(Delta_ts, errs_f_L, 's-', label = r'final angular momentum error $\delta_\mathrm{f} (L)$')
-    set_fig(ax = ax, title = 'Final errors vs. timesteps',
-            xlabel = r'timestep $\Delta t$', ylabel = r'final error $\delta_\mathrm{f}$',
-            xlim = [4e-4, 5e-3], xlog = True, ylog = True)
+    set_fig(ax = ax, title = 'Final errors vs. timesteps', xlabel = r'timestep $\Delta t$',
+            ylabel = r'final error $\delta_\mathrm{f}$', xlim = [4e-4, 5e-3], xlog = True, ylog = True)
     save_fig(fig = fig, name = f'prob3.1.2')
 
     # problem 3.1.3
@@ -304,12 +303,11 @@ def main():
     ts_numeric, xs_numeric, ys_numeric, vs_x_numeric, vs_y_numeric = RK4(Delta_t = 0.5, t_f = t_f)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 2 * DPI_MIN)
     ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'RK4 ($\Delta t$ = 0.5)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True,
-            title = r'Particle trajectory over 2 orbital periods',
-            xlabel = r'$x$', ylabel = r'$y$')
+    set_fig(ax = ax, equal = True, title = r'Particle trajectory over 2 orbital periods', xlabel = r'$x$',
+            ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.3')
 
     #
@@ -317,25 +315,23 @@ def main():
     errs_f_pos, errs_f_E, errs_f_L = calc_errors(Delta_ts = Delta_ts, t_f = t_f, method = forwardEuler)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(Delta_ts, errs_f_pos, 'o-', label = r'final position error $\delta_\mathrm{f} (r)$')
     ax.plot(Delta_ts, errs_f_E, '^-', label = r'final total energy error $\delta_\mathrm{f} (E)$')
     ax.plot(Delta_ts, errs_f_L, 's-', label = r'final angular momentum error $\delta_\mathrm{f} (L)$')
-    set_fig(ax = ax, title = 'Final errors vs. timesteps',
-            xlabel = r'timestep $\Delta t$', ylabel = r'final error $\delta_\mathrm{f}$',
-            xlim = [0.04, 0.5], xlog = True, ylog = True)
+    set_fig(ax = ax, title = 'Final errors vs. timesteps', xlabel = r'timestep $\Delta t$',
+            ylabel = r'final error $\delta_\mathrm{f}$', xlim = [0.04, 0.5], xlog = True, ylog = True)
     save_fig(fig = fig, name = f'prob3.1.4')
 
     # numerical solution
     ts_numeric, xs_numeric, ys_numeric, vs_x_numeric, vs_y_numeric = RK4(Delta_t = 1.0, t_f = t_f)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 2 * DPI_MIN)
     ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'RK4 ($\Delta t$ = 1.0)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True,
-            title = r'Particle trajectory over 2 orbital periods',
-            xlabel = r'$x$', ylabel = r'$y$')
+    set_fig(ax = ax, equal = True, title = r'Particle trajectory over 2 orbital periods', xlabel = r'$x$',
+            ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.5')
 
     # problem 3.1.4
@@ -345,12 +341,11 @@ def main():
     ts_numeric, xs_numeric, ys_numeric, vxs_numeric, vys_numeric = leapfrog(Delta_t = 0.3, t_f = t_f)
 
     # plot and save
-    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8), dpi = 2 * DPI_MIN)
     ax.plot(xs_numeric, ys_numeric, linestyle='--', label=r'leapfrog ($\Delta t$ = 0.3)')
     ax.plot(xs_analy, ys_analy, label='analytical')
-    set_fig(ax = ax, equal = True,
-            title = r'Particle trajectory over 10 orbital periods',
-            xlabel = r'$x$', ylabel = r'$y$')
+    set_fig(ax = ax, equal = True, title = r'Particle trajectory over 10 orbital periods', xlabel = r'$x$',
+            ylabel = r'$y$')
     save_fig(fig = fig, name = f'prob3.1.6')
 
     # errors
@@ -359,10 +354,9 @@ def main():
     # plot and save
     fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(ts_numeric, np.sqrt((xs_numeric - np.cos(ts_numeric))**2 + (ys_numeric - np.sin(ts_numeric))**2), 'o-', label = r'position error $\delta (r)$')
-    ax.plot(ts_numeric, np.abs(np.array(Es_numeric) - Es_numeric[0]), '^-', label = r'total energy error $\delta (E)$')
-    ax.plot(ts_numeric, np.abs(np.array(Ls_numeric) - Ls_numeric[0]), 's-', label = r'angular momentum error $\delta (L)$')
-    set_fig(ax = ax, title = 'Different errors over time',
-            xlabel = r'time $t$', ylabel = r'error $\delta$',
+    ax.plot(ts_numeric, np.abs(np.array(Es_numeric) - Es_numeric[0]), '^-', label = r'absolute total energy error $\delta (E)$')
+    ax.plot(ts_numeric, np.abs(np.array(Ls_numeric) - Ls_numeric[0]), 's-', label = r'absolute angular momentum error $\delta (L)$')
+    set_fig(ax = ax, title = 'Different errors over time', xlabel = r'time $t$', ylabel = r'error $\delta$',
             ylog = True)
     save_fig(fig = fig, name = f'prob3.1.7')
 

@@ -1,0 +1,2 @@
+4.2 Error level is lost for double precision (-0.5)
+4.4 Condition number should not be calculated with library (-1.5)  

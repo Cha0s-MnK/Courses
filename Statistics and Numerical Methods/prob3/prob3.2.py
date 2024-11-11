@@ -1,7 +1,7 @@
 """
 Function: Solution to Problem 3.2 in Statistics & Numerical Methods.
 Usage:    python3.11 prob3.2.py
-Version:  Last edited by Cha0s_MnK on 2024-11-06 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-11-11 (UTC+08:00).
 """
 
 ###########################################
@@ -75,23 +75,23 @@ def main():
     v_ds = backwardEuler1D(t_s = t_s, times = times, v_g = lambda t: 1.0)
 
     # plot 1
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(times, v_ds, label=r'backward Euler ($\Delta t$ = 0.1)')
     ax.plot(times, np.ones_like(times), linestyle='--', label=r'gas velocity $v_\mathrm{g}$')
     ax.plot(times, 1 - np.exp(- times), label='analytical')
-    set_fig(ax = ax, title = r'Time evolution of $v_\mathrm{d}$',
-            xlabel = r'time $t$', ylabel = r'dust velocity $v_\mathrm{d}$', ylim = [-0.1, 1.1])
+    set_fig(ax = ax, title = r'Time evolution of $v_\mathrm{d}$', xlabel = r'time $t$',
+            ylabel = r'dust velocity $v_\mathrm{d}$', ylim = [-0.1, 1.1])
     save_fig(fig = fig, name = f'prob3.2.1')
 
     # numerical solution
     v_ds = backwardEuler1D(t_s = t_s, times = times, v_g=lambda t: np.sin(t))
 
     # plot 2
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(times, v_ds, label=r'backward Euler ($\Delta t$ = 0.1)')
     ax.plot(times, np.sin(times), linestyle='--', label=r'gas velocity $v_\mathrm{g}$')
-    set_fig(ax = ax, title = r'Time evolution of $v_\mathrm{d}$',
-            xlabel = r'time $t$', ylabel = r'dust velocity $v_\mathrm{d}$')
+    set_fig(ax = ax, title = r'Time evolution of $v_\mathrm{d}$', xlabel = r'time $t$',
+            ylabel = r'dust velocity $v_\mathrm{d}$')
     save_fig(fig = fig, name = f'prob3.2.2')
 
     # numerical solution
@@ -99,11 +99,11 @@ def main():
     v_ds = backwardEuler1D(t_s = t_s, times = times, v_g=lambda t: np.sin(t))
 
     # plot 3
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(times, v_ds, label=r'backward Euler ($\Delta t$ = 0.1)')
     ax.plot(times, np.sin(times), linestyle='--', label=r'gas velocity $v_\mathrm{g}$')
-    set_fig(ax = ax, title = r'Time evolution of $v_\mathrm{d}$',
-            xlabel = r'time $t$', ylabel = r'dust velocity $v_\mathrm{d}$')
+    set_fig(ax = ax, title = r'Time evolution of $v_\mathrm{d}$', xlabel = r'time $t$',
+            ylabel = r'dust velocity $v_\mathrm{d}$')
     save_fig(fig = fig, name = f'prob3.2.3')
 
     # problem 3.2.5
@@ -115,21 +115,21 @@ def main():
     v_gs, v_ds = backwardEuler(times = times)
 
     # plot 1: gas velocity and first 5 dust species velocities (first 10 steps)
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(times[:11], v_gs[:11], label=r'gas velocity $v_\mathrm{g}$')
     for i in range(5):
         ax.plot(times[:11], v_ds[i, :11], label=f'dust species {i+1} velocity')
-    set_fig(ax = ax, title = 'Gas and 1st 5 dust species velocities (1st 10 steps)',
-            xlabel = r'time $t$', ylabel = r'velocity $v$', ylim = [-0.1, 1.1])
+    set_fig(ax = ax, title = 'Gas and 1st 5 dust species velocities (1st 10 steps)', xlabel = r'time $t$',
+            ylabel = r'velocity $v$', ylim = [-0.1, 1.1])
     save_fig(fig = fig, name = f'prob3.2.4')
 
     # plot 2: gas velocity and remaining 5 dust species velocities (logarithmic time scale)
-    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 4 * DPI_MIN)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 6), dpi = 2 * DPI_MIN)
     ax.plot(times[1:], v_gs[1:], label=r'gas velocity $v_\mathrm{g}$')
     for i in range(5, M):
         ax.plot(times[1:], v_ds[i, 1:], label=f'dust species {i+1} velocity')
-    set_fig(ax = ax, title = 'Gas and remaining 5 dust species velocities',
-            xlabel = r'time $t$', xlog=True, ylabel = r'velocity $v$', ylim = [-0.1, 1.1])
+    set_fig(ax = ax, title = 'Gas and remaining 5 dust species velocities', xlabel = r'time $t$',
+            xlog=True, ylabel = r'velocity $v$', ylim = [-0.1, 1.1])
     save_fig(fig = fig, name = f'prob3.2.5')
 
 if __name__ == "__main__":
