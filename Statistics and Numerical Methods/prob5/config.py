@@ -1,7 +1,7 @@
 """
 Function: Configuration file of Python scripts used by Cha0s_MnK
 Usage:    ~/*.py: from config import *
-Version:  Last edited by Cha0s_MnK on 2024-11-28 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-11-29 (UTC+08:00).
 """
 
 #########################
