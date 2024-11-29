@@ -1,7 +1,7 @@
 """
 Function: Solution to Problem 5.3 in Statistics & Numerical Methods.
 Usage:    python3.11 prob5.3.py
-Version:  Last edited by Cha0s_MnK on 2024-11-28 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-11-29 (UTC+08:00).
 """
 
 ############################################
@@ -10,90 +10,74 @@ Version:  Last edited by Cha0s_MnK on 2024-11-28 (UTC+08:00).
 
 from config import *
 
-N = int(1e6)           # Number of particles
-r_s = 20.0             # Scale radius in kpc
-C = 10.0               # Concentration parameter
-r_max = 30.0           # Maximum radius in kpc
-H0 = 70.0              # Hubble constant in km/s/Mpc
+N     = INT(1e6) # number of particles
+r_s   = 20.0     # scale radius [kpc]
+C     = 10.0     # concentration parameter
+r_max = 30.0     # maximum radius [kpc]
+H0    = 70.0     # Hubble constant [km·s⁻¹·Mpc⁻¹]
 
 ######################
 # HELPER FUNCTION(S) #
 ######################
 
-def delta_c(C):
-    numerator = (200.0 / 3.0) * C**3
-    denominator = np.log(1 + C) - C / (1 + C)
-    return numerator / denominator
+def calc_delta_c(C):
+    return 200.0 * C**3 / (3 * (np.log(1 + C) + 1 / (1 + C) - 1))
 
-# Cumulative mass function M(s)
-def M_s(s):
-    return np.log(1 + s) - s / (1 + s)
+def calc_G_mod():
+    return G * M_sun / (kpc * 1e6)  # pc * (km/s)^2 / M_sun
+
+def calc_Fr_coef(x):
+    return np.log(1 + x) + 1 / (1 + x) - 1
 
 #################
 # MAIN FUNCTION #
 #################
 
 def main():
-    # Calculate delta_c
-    delta_c_value = delta_c(C)
+    # calculate parameters
+    delta_c = calc_delta_c(C)
+    H0_mod  = H0 / 1e3 # Hubble constant [km·s⁻¹·kpc⁻¹]
+    G_mod   = calc_G_mod()
+    rho_c   = (3 * H0_mod**2) / (8 * np.pi * G)
+    Fr_coef = 1 / calc_Fr_coef(x = r_max / r_s)
+    M_max   = 4 * np.pi * rho_c * delta_c * r_s**3 / Fr_coef
+    print(f"delta_c = {delta_c}")
+    print(f"H0      = {H0_mod} km·s⁻¹·kpc⁻¹")
+    print(f"G       = {G_mod} pc·(km/s)²·M☉⁻¹")
+    print(f"rho_c   = {rho_c} M☉·kpc⁻³")
+    print(f"Fr_coef = {Fr_coef}")
+    print(f"M_max   = {M_max} M☉")
 
-    # Convert H0 to km/s/kpc
-    H0_kpc = H0 / 1000.0  # km/s/kpc
+    # define the radius array for CDF calculation
+    rs = np.linspace(0.0, r_max, INT(3e6))[1:] # avoid r = 0 to prevent lg(0)
 
-    # Gravitational constant in units of kpc * (km/s)^2 / M_sun
-    G = 4.30091e-6  # kpc (km/s)^2 / M_sun
+    # calculate CDF F(r)
+    Frs = Fr_coef * calc_Fr_coef(x = rs / r_s)
 
-    # Calculate critical density in M_sun/kpc^3
-    rho_c = (3 * H0_kpc**2) / (8 * np.pi * G)
+    # create inverse CDF interpolation function
+    Frs_inv = interp1d(Frs, rs, kind='linear', bounds_error=False, fill_value=(rs[0], rs[-1]))
 
-    # Characteristic density rho_s
-    rho_s = rho_c * delta_c_value
+    # sample radii using inverse CDF
+    rs_sample = Frs_inv(np.random.uniform(0.0, 1.0, N))
 
-    # Dimensionless radius s = r / r_s
-    s_max = r_max / r_s
+    # calculate radial density distribution
+    bins         = np.linspace(0.1, r_max, 1999) # avoid r = 0 to prevent lg(0)
+    bin_centres  = 0.5 * (bins[:-1] + bins[1:])
+    dFrs, _      = np.histogram(rs_sample, bins=bins) # bin the sampled radii
+    dVs          = (4 / 3) * np.pi * (bins[1:]**3 - bins[:-1]**3) # volume element of spherical shells
+    rhos_sampled = M_max * dFrs / dVs / N
 
-    # Generate an array of s values
-    s = np.linspace(1e-5, s_max, 100000)
+    # plot
+    fig, ax = plt.subplots(1, 1, figsize=(10, 6), dpi = 2 * DPI_MIN)
+    ax.plot(np.log10(bin_centres), np.log10(rhos_sampled), label='Monte Carlo sampling', drawstyle='steps-mid')
+    rhos_analy = rho_c * delta_c * r_s**3 / (rs * (rs + r_s)**2) # analytic NFW profile
+    ax.plot(np.log10(rs), np.log10(rhos_analy), label='analytic')
 
-    # Total mass within s_max
-    M_tot = M_s(s_max)
-
-    # Cumulative distribution function F(s)
-    F_s = M_s(s) / M_tot
-
-    # Create interpolation function for inverse CDF
-    inverse_cdf = interp1d(F_s, s, kind='linear')
-
-    # Generate random numbers uniformly distributed between 0 and 1
-    u_random = np.random.uniform(0, 1, N)
-
-    # Use inverse transform sampling to get s values
-    s_random = inverse_cdf(u_random)
-
-    # Calculate r values
-    r_random = s_random * r_s
-
-    # Compute theoretical density profile
-    r_theory = np.logspace(np.log10(0.01), np.log10(r_max), 1000)
-    s_theory = r_theory / r_s
-    rho_theory = rho_s / (s_theory * (1 + s_theory)**2)
-
-    # Compute particle density profile
-    bins = np.logspace(np.log10(0.01), np.log10(r_max), 50)
-    counts, edges = np.histogram(r_random, bins=bins)
-    shell_volumes = (4/3) * np.pi * (edges[1:]**3 - edges[:-1]**3)
-    particle_density = counts / shell_volumes
-
-    # Calculate bin centers
-    bin_centers = (edges[1:] + edges[:-1]) / 2
-
-    # Plotting
-    plt.figure(figsize=(10, 6))
-    plt.plot(np.log10(r_theory), np.log10(rho_theory), label='NFW Profile (Equation 5.3.1)', linewidth=2)
-    plt.scatter(np.log10(bin_centers), np.log10(particle_density), color='red', s=10, label='Particle Realization')
-    plt.xlabel(r'$\log_{10}[r/\mathrm{kpc}]$')
-    plt.ylabel(r'$\log_{10}\left[ \rho_\Lambda(r) / (M_\odot\, \mathrm{kpc}^{-3}) \right]$')
-    plt.title('Logarithmic Radial Density Distribution')
+    set_fig(ax = ax, title = r'Logarithmic Radial Density Distribution of the NFW Profile',
+            xlabel = r'Logarithmic radius lg$\displaystyle \frac{r}{\mathrm{kpc}}$',
+            ylabel = r'Logarithmic radial density lg$\displaystyle \frac{\rho_\Lambda(r)}{M_\odot \ \mathrm{kpc}^{-3}}$',
+            xlim=[-1, np.log10(r_max)], ylim=[10.4, 14.2])
+    save_fig(fig = fig, name = f'fig5.3')
 
 if __name__ == "__main__":
     main()

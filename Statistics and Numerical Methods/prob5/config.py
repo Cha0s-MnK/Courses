@@ -1,7 +1,7 @@
 """
 Function: Configuration file of Python scripts used by Cha0s_MnK
 Usage:    ~/*.py: from config import *
-Version:  Last edited by Cha0s_MnK on 2024-11-24 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-11-28 (UTC+08:00).
 """
 
 #########################
@@ -28,6 +28,7 @@ import os
 from pathlib import Path
 from scipy.integrate import quad
 import scipy.integrate as integrate
+from scipy.interpolate import interp1d
 from scipy.optimize import fsolve
 from scipy.optimize import minimize_scalar
 import scipy.stats as stats
@@ -40,14 +41,20 @@ import warnings
 ###################
 
 # physical constants (reference: https://en.wikipedia.org/wiki/List_of_physical_constants)
-c         = 2.99792458e8        # speed of light [m·s⁻¹]
-e         = 1.602176634e-19     # elementary charge [C]
-epsilon_0 = 8.854187817e-12     # vacuum permittivity [F·m⁻¹]
-G         = 4.301220369e-3      # gravitational constant [pc·(km/s)²·M☉⁻¹]
-h         = 6.62607015e-34      # Planck constant [J·s]
-k_B       = 1.380649e-23        # Boltzmann constant [J·K⁻¹]
-m_e       = 9.109383713928e-31  # electron mass [kg]
-m_p       = 1.6726219259552e-27 # proton mass [kg]
+c         = 2.99792458e8          # speed of light [m·s⁻¹]
+e         = 1.602176634e-19       # elementary charge [C]
+epsilon_0 = 8.854187817e-12       # vacuum permittivity [F·m⁻¹]
+G         = 6.6743015e-11         # gravitational constant [m³·kg⁻¹·s⁻²]
+G_astro   = 4.301059e-3           # gravitational constant [pc·(km/s)²·M☉⁻¹]
+h         = 6.62607015e-34        # Planck constant [J·s]
+k_B       = 1.380649e-23          # Boltzmann constant [J·K⁻¹]
+m_e       = 9.109383713928e-31    # electron mass [kg]
+m_p       = 1.6726219259552e-27   # proton mass [kg]
+M_sun     = 1.988475e30           # solar mass [kg] (reference: https://en.wikipedia.org/wiki/Solar_mass)
+pc        = 3.0856775814913673e16 # parsec [m] (reference: https://en.wikipedia.org/wiki/Parsec)
+
+kpc = 1e3 * pc                   # kiloparsec [m]
+Mpc = 1e6 * pc                   # megaparsec [m]
 
 BOX_SIZE = np.float64(1.0)
 DPI_MIN  = np.int64(256)
