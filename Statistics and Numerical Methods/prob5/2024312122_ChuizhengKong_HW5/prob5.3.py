@@ -1,7 +1,7 @@
 """
 Function: Solution to Problem 5.3 in Statistics & Numerical Methods.
 Usage:    python3.11 prob5.3.py
-Version:  Last edited by Cha0s_MnK on 2024-11-29 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-12-08 (UTC+08:00).
 """
 
 ############################################
@@ -38,7 +38,7 @@ def main():
     delta_c = calc_delta_c(C)
     H0_mod  = H0 / 1e3 # Hubble constant [km·s⁻¹·kpc⁻¹]
     G_mod   = calc_G_mod()
-    rho_c   = (3 * H0_mod**2) / (8 * np.pi * G)
+    rho_c   = (3 * H0_mod**2) / (8 * np.pi * G_mod)
     Fr_coef = 1 / calc_Fr_coef(x = r_max / r_s)
     M_max   = 4 * np.pi * rho_c * delta_c * r_s**3 / Fr_coef
     print(f"delta_c = {delta_c}")
@@ -76,7 +76,7 @@ def main():
     set_fig(ax = ax, title = r'Logarithmic Radial Density Distribution of the NFW Profile',
             xlabel = r'Logarithmic radius lg$\displaystyle \frac{r}{\mathrm{kpc}}$',
             ylabel = r'Logarithmic radial density lg$\displaystyle \frac{\rho_\Lambda(r)}{M_\odot \ \mathrm{kpc}^{-3}}$',
-            xlim=[-1, np.log10(r_max)], ylim=[10.4, 14.2])
+            xlim=[-1, np.log10(r_max)], ylim=[5.5, 9.5])
     save_fig(fig = fig, name = f'fig5.3')
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ p0 = FLOAT(0.25)
 
 def calc1():
     p_hat = k / n
-    z     = (p_hat - p0) * math.sqrt(n / (p_hat * (1 - p_hat)))
+    z     = (p_hat - p0) * math.sqrt(n / (p0 * (1 - p0)))
     # use the CDF of the standard normal distribution
     return 1 - stats.norm.cdf(z)
 
@@ -35,6 +35,8 @@ def calc2():
 #################
 
 def main():
+    print(f"sigma_p_hat = {math.sqrt(p0 * (1 - p0))}")
+    print(f"z           = {(k / n - p0) * math.sqrt(n / (p0 * (1 - p0)))}")
     print(f"Result of the integral in 5.1.1: {calc1()}")
     print(f"Result of the integral in 5.1.2: {calc2()}")
 
