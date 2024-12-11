@@ -1,7 +1,7 @@
 """
 Function: Solution to Problem 5.1 in Statistics & Numerical Methods.
 Usage:    python3.11 prob5.1.py
-Version:  Last edited by Cha0s_MnK on 2024-11-27 (UTC+08:00).
+Version:  Last edited by Cha0s_MnK on 2024-12-08 (UTC+08:00).
 """
 
 #########################################

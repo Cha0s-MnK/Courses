@@ -1,0 +1,2 @@
+1.1 Result of CG is not optimal. (-1)
+2.3 Library used. (-1)  
